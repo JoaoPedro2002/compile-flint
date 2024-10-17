@@ -1,16 +1,11 @@
-##########################################################
-#  Make file that statically compiles the dependencies.  #
-##########################################################
-# The sources are downloaded, than unpacked and compiled #
-##########################################################
-
-
+##################################################################
+#  Makefile that statically compiles flint and its dependencies. #
+##################################################################
 # Dirs
 CURR_DIR=$(shell pwd)
 OUTPUT_DIR := ${CURR_DIR}/output
 SO_OUTPUT_DIR := ${OUTPUT_DIR}/shared
 WASM_OUTPUT_DIR := ${OUTPUT_DIR}/wasm
-
 BUILD_DIR := ${CURR_DIR}/build
 __dummy := $(shell mkdir -p ${BUILD_DIR} ${SO_OUTPUT_DIR} ${WASM_OUTPUT_DIR})
 
@@ -37,14 +32,18 @@ ${MPFR} := MPFR
 ${FLINT} := FLINT
 ${GMP} := GMP
 
+# Commands
 COMPILE_MAKE = make -j $(shell expr $(shell nproc) + 1)
-
 EMCONFIGURE := emconfigure ./configure --build i686-pc-linux-gnu --disable-assembly --host=none --prefix=${WASM_OUTPUT_DIR} CFLAGS="-O3 -Wall"
 EMMAKE := emmake make -j $(shell expr $(shell nproc) + 1) && emmake make install
 
 .PHONY: all clean libflint libgmp libmpfr
 
-all: ${WASM_OUTPUT_DIR}/libflint.a ${SO_OUTPUT_DIR}/libflint.so
+all: shared wasm
+
+wasm: ${WASM_OUTPUT_DIR}/libflint.a
+
+shared: ${SO_OUTPUT_DIR}/libflint.so
 
 ${WASM_OUTPUT_DIR}/libgmp.a: ${BUILD_DIR}/${GMP}/
 	cd ${BUILD_DIR}/${GMP}/ && CC_FOR_BUILD=gcc ${EMCONFIGURE} && ${EMMAKE}

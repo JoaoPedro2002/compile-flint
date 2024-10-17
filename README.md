@@ -1,16 +1,34 @@
-# Web Assembly build of FLINT: fast library for number theory
+# Build of FLINT as a WebAssembly library and Shared Object
 
-This automates the process of building MPFR, MPIR, and [FLINT](http://www.flintlib.org/f) as WASM libraries using emscripten, so they could be used in a web application or from node.js.  This thus creates cross platform wasm binaries that make the functionality of FLINT available to node.js or any modern web browser.  Currently you might use this by writing a C/C++ program that relies on FLINT, and links in the libraries built using the recipe here, then building that for deployment on the web using [emscripten](https://emscripten.org/).
+This fork adds the option to build FLINT as a shared object and replaces mpir with gmp. 
+
+The project automates the process of building MPFR, GMP, and [FLINT](http://www.flintlib.org/f) as WASM libraries using 
+emscripten, so they could be used in a web application or from node.js.  This thus creates cross platform wasm binaries 
+that make the functionality of FLINT available to node.js or any modern web browser.  Currently you might use this by 
+writing a C/C++ program that relies on FLINT, and links in the libraries built using the recipe here, then building that
+for deployment on the web using [emscripten](https://emscripten.org/).
 
 ## Quickstart
 
 This will download and build the three libraries, assuming you have [installed the emscripten toolchain.](https://emscripten.org/docs/getting_started/downloads.html)
 
 ```sh
-$ ./build.sh
+$ make all
+```
+ If you want to build only as a shared object, do this:
+
+```sh
+$ make shared
 ```
 
-This should take less than a half hour.  They get installed into `build/local` .
+Or if you want to build only as a WebAssembly library:
+
+```sh
+$ make wasm
+```
+
+
+This should take less than a half hour.  By default, they get installed into `output/wasm` and `output/shared`.
 
 ## Test a program using FLINT
 
