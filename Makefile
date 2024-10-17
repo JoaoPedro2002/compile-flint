@@ -37,13 +37,13 @@ COMPILE_MAKE = make -j $(shell expr $(shell nproc) + 1)
 EMCONFIGURE := emconfigure ./configure --build i686-pc-linux-gnu --disable-assembly --host=none --prefix=${WASM_OUTPUT_DIR} CFLAGS="-O3 -Wall"
 EMMAKE := emmake make -j $(shell expr $(shell nproc) + 1) && emmake make install
 
-.PHONY: all clean libflint libgmp libmpfr
+.PHONY: wasm shared libflint libgmp libmpfr build-clean
 
-all: shared wasm
+#all: wasm shared
 
-wasm: ${WASM_OUTPUT_DIR}/libflint.a
+	wasm: build-clean ${WASM_OUTPUT_DIR}/libflint.a
 
-shared: ${SO_OUTPUT_DIR}/libflint.so
+shared: build-clean ${SO_OUTPUT_DIR}/libflint.so
 
 ${WASM_OUTPUT_DIR}/libgmp.a: ${BUILD_DIR}/${GMP}/
 	cd ${BUILD_DIR}/${GMP}/ && CC_FOR_BUILD=gcc ${EMCONFIGURE} && ${EMMAKE}
@@ -73,6 +73,11 @@ ${BUILD_DIR}/%/: %.tar.gz
 
 %.tar.gz:
 	wget -q $($($*)_SOURCE) -O $@
+
+build-clean:
+	if [ -d ${BUILD_DIR}/${FLINT} ]; then cd ${BUILD_DIR}/${FLINT}/ && make clean; fi
+	if [ -d ${BUILD_DIR}/${MPFR} ]; then cd ${BUILD_DIR}/${MPFR}/ && make clean; fi
+	if [ -d ${BUILD_DIR}/${GMP} ]; then cd ${BUILD_DIR}/${GMP}/ && make clean; fi
 
 clean:
 	rm -rf ${BUILD_DIR} ${OUTPUT_DIR}
